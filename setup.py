@@ -166,13 +166,17 @@ class PCTBuildExt (build_ext):
         if not ac.get("HAVE_WMMINTRIN_H"):
             # AES-NI instrincs not available
             self.__remove_extensions(["Crypto.Cipher._AESNI"])
+            self.__remove_extensions(["Crypto.Cipher._TWOAESNI"])
         elif not (ac.get("HAVE_POSIX_MEMALIGN") or ac.get("HAVE_ALIGNED_ALLOC")
                   or ac.get("HAVE__ALIGNED_MALLOC")):
             # no function to allocate aligned memory is available
             self.__remove_extensions(["Crypto.Cipher._AESNI"])
+            self.__remove_extensions(["Crypto.Cipher._TWOAESNI"])
         elif ac.get("HAVE_MAES"):
             # -maes has to be passed to the compiler to use the AES-NI instrincs
             self.__add_extension_compile_option(["Crypto.Cipher._AESNI"],
+                                                ["-maes"])
+            self.__add_extension_compile_option(["Crypto.Cipher._TWOAESNI"],
                                                 ["-maes"])
 
     def __add_extension_compile_option(self, names, options):
@@ -447,9 +451,15 @@ kw = {'name':"pycrypto",
             Extension("Crypto.Cipher._AES",
                       include_dirs=['src/'],
                       sources=["src/AES.c"]),
+            Extension("Crypto.Cipher._TWOAES",
+                      include_dirs=['src/'],
+                      sources=["src/TWOAES.c"]),
             Extension("Crypto.Cipher._AESNI",
                       include_dirs=['src/'],
                       sources=["src/AESNI.c"]),
+            Extension("Crypto.Cipher._TWOAESNI",
+                      include_dirs=['src/'],
+                      sources=["src/TWOAESNI.c"]),
             Extension("Crypto.Cipher._ARC2",
                       include_dirs=['src/'],
                       sources=["src/ARC2.c"]),
