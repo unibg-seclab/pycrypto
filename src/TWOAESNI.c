@@ -184,7 +184,6 @@ static void aes_key_setup_dec(__m128i dk[], const __m128i ek[], int rounds)
 
 static void block_init(block_state* self, unsigned char* key, int keylen)
 {
-    printf("TWOAESNI powaa");
     int nr = 0;
     keylen = keylen / 2;
     switch (keylen) {
