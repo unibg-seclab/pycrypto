@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from Crypto.Cipher import AES, TWOAES
 from timeit import default_timer
 from os import urandom
