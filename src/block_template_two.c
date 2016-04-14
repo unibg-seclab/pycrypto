@@ -87,7 +87,8 @@ ALGdealloc(PyObject *ptr)
 	memset(self->IV, 0, BLOCK_SIZE);
 	memset(self->oldCipher, 0, BLOCK_SIZE);
 	memset((char*)&(self->st), 0, sizeof(block_state));
-	self->mode = self->count = self->window = 1;
+	self->mode = self->count = 0;
+	self->window = 10;
 	PyObject_Del(ptr);
 }
 
@@ -104,7 +105,7 @@ ALGnew(PyObject *self, PyObject *args, PyObject *kwdict)
 {
 	unsigned char *key, *IV;
 	ALGobject * new=NULL;
-	int keylen, IVlen=0, mode=MODE_ECB, window=1;
+	int keylen, IVlen=0, mode=MODE_ECB, window=10;
 	PyObject *counter = NULL;
 	int counter_shortcut = 0;
 
