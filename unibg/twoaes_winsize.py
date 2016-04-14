@@ -55,6 +55,4 @@ if __name__ == '__main__':
     print('\n' + "WITH AESNI".center(72, '='))
     for window in range(1, 20):
         test(use_aesni=True, size=4*MiB, window=window)
-#    print('\n' + "WITHOUT AESNI".center(72, '='))
-#    test(use_aesni=False)
 

@@ -56,6 +56,6 @@ def test(use_aesni):
 if __name__ == '__main__':
     print('\n' + "WITH AESNI".center(72, '='))
     test(use_aesni=True)
-#    print('\n' + "WITHOUT AESNI".center(72, '='))
-#    test(use_aesni=False)
+    print('\n' + "WITHOUT AESNI".center(72, '='))
+    test(use_aesni=False)
 
