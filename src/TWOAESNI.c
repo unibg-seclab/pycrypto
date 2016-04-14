@@ -1,5 +1,5 @@
 /*
- *  TWOAESNI.c: AES using AES-NI instructions
+ *  AESNI.c: AES using AES-NI instructions
  *
  * Written in 2013 by Sebastian Ramacher <sebastian@ramacher.at>
  *
@@ -185,7 +185,7 @@ static void aes_key_setup_dec(__m128i dk[], const __m128i ek[], int rounds)
 static void block_init(block_state* self, unsigned char* key, int keylen)
 {
     int nr = 0;
-    keylen = keylen / 2;
+    keylen /= 2;
     switch (keylen) {
         case 16: nr = 10; break;
         case 24: nr = 12; break;
@@ -226,7 +226,7 @@ static void block_finalize(block_state* self)
     aligned_free_wrapper(self->dk);
 }
 
-static void aes_block_encrypt(block_state* self, const u8* in, u8* out)
+static void block_encrypt(block_state* self, const u8* in, u8* out)
 {
     __m128i m = _mm_loadu_si128((const __m128i*) in);
     /* first 9 rounds */
@@ -254,7 +254,7 @@ static void aes_block_encrypt(block_state* self, const u8* in, u8* out)
     _mm_storeu_si128((__m128i*) out, m);
 }
 
-static void aes_block_decrypt(block_state* self, const u8* in, u8* out)
+static void block_decrypt(block_state* self, const u8* in, u8* out)
 {
     __m128i m = _mm_loadu_si128((const __m128i*) in);
     /* first 9 rounds */
@@ -282,14 +282,4 @@ static void aes_block_decrypt(block_state* self, const u8* in, u8* out)
     _mm_storeu_si128((__m128i*) out, m);
 }
 
-static void block_encrypt(block_state* self, const u8* in, u8* out) {
-    u8 temp[16];
-    aes_block_decrypt(self, in, temp);
-    aes_block_encrypt(self, temp, out);
-}
-
-static void block_decrypt(block_state* self, const u8* in, u8* out) {
-    printf("not implemented\n");
-}
-
-#include "block_template.c"
+#include "block_template_two.c"
