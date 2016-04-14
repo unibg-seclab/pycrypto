@@ -27,3 +27,5 @@ src/stamp-h1
 
 # Tox
 .tox
+
+.cache
