@@ -11,6 +11,8 @@ GiB = 2**10 * MiB
 # bytegenerator = lambda size: urandom(size)
 bytegenerator = lambda size: bytes(bytearray(size))
 
+window = 10
+
 #OCCUPYRAM = bytegenerator(5 * GiB)
 
 k1 = '1234567890123456'
@@ -20,7 +22,12 @@ def test(use_aesni):
 
     a1 = AES.new(k1, mode=AES.MODE_ECB, use_aesni=use_aesni)
     a2 = AES.new(k2, mode=AES.MODE_ECB, use_aesni=use_aesni)
-    ta = TWOAES.new(k1 + k2, mode=TWOAES.MODE_ECB, use_aesni=use_aesni)
+
+    if use_aesni:
+        ta = TWOAES.new(k1+k2, mode=TWOAES.MODE_ECB, use_aesni=True, window=window)
+    else:
+        ta = TWOAES.new(k1+k2, mode=TWOAES.MODE_ECB, use_aesni=False)
+
 
     sizes = [1*KiB, 10*KiB, 100*KiB,
              1*MiB, 10*MiB, 100*MiB]
