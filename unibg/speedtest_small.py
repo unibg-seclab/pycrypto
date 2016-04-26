@@ -179,7 +179,7 @@ class Benchmark:
     def run(self):
         block_specs = [
             ("AES128", AES, 16),
-            ("AES192", AES, 24),
+#            ("AES192", AES, 24),
             ("AES256", AES, 32),
         ]
 
@@ -187,10 +187,10 @@ class Benchmark:
             print('=== WITH%s AESNI ===' % ('   ' if aesni else 'OUT'))
 
             for cipher_name, module, key_bytes in block_specs:
+                self.test_encryption("%s-ECB" % (cipher_name,), module, key_bytes, module.MODE_ECB, use_aesni=aesni)
 #               self.test_key_setup("%s-CBC" % (cipher_name,), module, key_bytes, module.MODE_CBC, use_aesni=aesni)
                 self.test_encryption("%s-CBC" % (cipher_name,), module, key_bytes, module.MODE_CBC, use_aesni=aesni)
-                self.test_encryption("%s-OFB" % (cipher_name,), module, key_bytes, module.MODE_OFB, use_aesni=aesni)
-                self.test_encryption("%s-ECB" % (cipher_name,), module, key_bytes, module.MODE_ECB, use_aesni=aesni)
+#                self.test_encryption("%s-OFB" % (cipher_name,), module, key_bytes, module.MODE_OFB, use_aesni=aesni)
 
 #               self.test_key_setup("%s-CTR" % (cipher_name,), module, key_bytes, module.MODE_CTR, use_aesni=aesni)
                 self.test_encryption("%s-CTR" % (cipher_name,), module, key_bytes, module.MODE_CTR, use_aesni=aesni)
