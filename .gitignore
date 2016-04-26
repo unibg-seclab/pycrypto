@@ -29,3 +29,5 @@ src/stamp-h1
 .tox
 
 .cache
+
+/venv
