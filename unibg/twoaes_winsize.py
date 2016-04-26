@@ -65,14 +65,14 @@ def test(use_aesni, size, window):
     print(pattern.format(window, results[0], results[2]))
     return results
 
-def show(results, outfile='test.png'):
+def plot(results):
     xs = range(MINWIN, MAXWIN+1)
     ys_aesaes, std_aesaes, ys_twoaes, std_twoaes = map(array, zip(*results))
     ys_aesaes = array([mean(ys_aesaes) for _ in xrange(len(xs))])
     std_aesaes = array([mean(std_aesaes) for _ in xrange(len(xs))])
 
     plt.xlabel('TWOAES windows size (blocks)')
-    plt.xlim(xs[0]-.1, xs[-1]+.1)
+    plt.xlim(xs[0], xs[-1])
     plt.xticks(xs, xs)
 
     plt.ylabel('time (s)')
@@ -86,15 +86,11 @@ def show(results, outfile='test.png'):
                      facecolor='r', alpha=.2, interpolate=True)
 
     plt.legend()
-    plt.savefig(outfile)
 
 if __name__ == '__main__':
-    #print('\n' + "WITH AESNI".center(72, '='))
-    #results = [test(use_aesni=True, size=SIZE, window=window)
-    #           for window in range(MINWIN, MAXWIN+1)]
-    #show(results)
-
-    print('\n' + "WITHOUT AESNI".center(72, '='))
-    results = [test(use_aesni=False, size=SIZE, window=window)
+    print('\n' + "WITH AESNI".center(72, '='))
+    results = [test(use_aesni=True, size=SIZE, window=window)
                for window in range(MINWIN, MAXWIN+1)]
-    show(results, 'without_aesni.pdf')
+    plot(results)
+    plt.savefig('twoaes_winsize.pdf')
+    plt.savefig('twoaes_winsize.png')
