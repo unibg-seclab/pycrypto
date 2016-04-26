@@ -140,8 +140,8 @@ class Benchmark:
         key_setups_per_second = len(keys) / (t - t0)
         self.announce_result(key_setups_per_second/1000, "kKeys/sec")
 
-    def test_encryption(self, cipher_name, module, key_bytes, mode, **kwargs):
-        self.announce_start("%s encryption" % (cipher_name,))
+    def test_encryption(self, cipher_name, module, key_bytes, mode, silent=False, **kwargs):
+        if not silent: self.announce_start("%s encryption" % (cipher_name,))
 
         # Generate random keys for use with the tests
         rand = self.random_data(key_bytes + module.block_size)
@@ -174,7 +174,17 @@ class Benchmark:
         t = time.time()
 
         encryption_speed = (len(blocks) * len(blocks[0])) / (t - t0)
-        self.announce_result(encryption_speed / 10**6, "MBps")
+        mbps = encryption_speed / 10**6
+        if not silent: self.announce_result(mbps, "MBps")
+        return mbps
+
+    def multirun(self, cipher_name, module, key_bytes, mode, **kwargs):
+        runs = kwargs.pop('runs', 5)
+        results = [self.test_encryption(cipher_name, module, key_bytes, mode, silent=True, **kwargs)
+                   for run in range(runs)]
+        mbps = float(sum(results)) / len(results)
+        self.announce_start("%s encryption" % (cipher_name,))
+        self.announce_result(mbps, "MBps")
 
     def run(self):
         block_specs = [
@@ -183,17 +193,20 @@ class Benchmark:
             ("AES256", AES, 32),
         ]
 
+        runs = 10
+        print('=== %d runs each test ===' % runs)
+
         for aesni in (False, True):
             print('=== WITH%s AESNI ===' % ('   ' if aesni else 'OUT'))
 
             for cipher_name, module, key_bytes in block_specs:
-                self.test_encryption("%s-ECB" % (cipher_name,), module, key_bytes, module.MODE_ECB, use_aesni=aesni)
+                self.multirun("%s-ECB" % (cipher_name,), module, key_bytes, module.MODE_ECB, use_aesni=aesni, runs=10)
 #               self.test_key_setup("%s-CBC" % (cipher_name,), module, key_bytes, module.MODE_CBC, use_aesni=aesni)
-                self.test_encryption("%s-CBC" % (cipher_name,), module, key_bytes, module.MODE_CBC, use_aesni=aesni)
-#                self.test_encryption("%s-OFB" % (cipher_name,), module, key_bytes, module.MODE_OFB, use_aesni=aesni)
+                self.multirun("%s-CBC" % (cipher_name,), module, key_bytes, module.MODE_CBC, use_aesni=aesni, runs=10)
+#                self.multirun("%s-OFB" % (cipher_name,), module, key_bytes, module.MODE_OFB, use_aesni=aesni)
 
 #               self.test_key_setup("%s-CTR" % (cipher_name,), module, key_bytes, module.MODE_CTR, use_aesni=aesni)
-                self.test_encryption("%s-CTR" % (cipher_name,), module, key_bytes, module.MODE_CTR, use_aesni=aesni)
+                self.multirun("%s-CTR" % (cipher_name,), module, key_bytes, module.MODE_CTR, use_aesni=aesni, runs=10)
 
 if __name__ == '__main__':
     Benchmark().run()
