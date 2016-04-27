@@ -1,38 +1,51 @@
 #!/usr/bin/env python
 
+import matplotlib
+matplotlib.use('Agg') # do not use X
+from matplotlib import pyplot as plt
+
+from humanize.filesize import naturalsize
 from Crypto.Cipher import AES, TWOAES
+from functools import partial
 from timeit import default_timer
+import numpy as np
 from os import urandom
 
-KiB = 2**10
-MiB = 2**10 * KiB
-GiB = 2**10 * MiB
+## PARAMETERS ##
+EXPMIN = 10
+EXPMAX = 30
+RUNS = 10
+OUT = 2
 
 # bytegenerator = lambda size: urandom(size)
 bytegenerator = lambda size: bytes(bytearray(size))
-
-window = 10
 
 #OCCUPYRAM = bytegenerator(5 * GiB)
 
 k1 = '1234567890123456'
 k2 = 'abcdefghijklmnop'
 
-def test(use_aesni):
+sizes = [2**exp for exp in range(EXPMIN, EXPMAX+1)]
+pattern = '{:<22} | {:<22} | {:<22}'
+
+def remove_outliers(data, outliers):
+    data.sort()
+    return data if not outliers else data[outliers:-outliers]
+
+def repeat(fn, times, outliers):
+    data = [fn() for _ in range(times)]
+    data = remove_outliers(data, outliers)
+    return np.mean(data), np.std(data)
+
+def test(size, use_aesni):
 
     a1 = AES.new(k1, mode=AES.MODE_ECB, use_aesni=use_aesni)
     a2 = AES.new(k2, mode=AES.MODE_ECB, use_aesni=use_aesni)
 
     if use_aesni:
-        ta = TWOAES.new(k1+k2, mode=TWOAES.MODE_ECB, use_aesni=True, window=window)
+        ta = TWOAES.new(k1+k2, mode=TWOAES.MODE_ECB, use_aesni=True, window=10)
     else:
         ta = TWOAES.new(k1+k2, mode=TWOAES.MODE_ECB, use_aesni=False)
-
-
-    sizes = [1*KiB, 10*KiB, 100*KiB,
-             1*MiB, 10*MiB, 100*MiB]
-#            1*GiB]
-
 
     def single_test(size, recrypt):
         # setup
@@ -50,19 +63,49 @@ def test(use_aesni):
         plain = a1.decrypt(cipher)
         return a2.encrypt(plain)
 
-    pattern = '{:^22} | {:^22} | {:^22}'
-    print(pattern.format('SIZE', 'TIME AES+AES', 'TIME TWOAES'))
-    print(pattern.format('-'*22, '-'*22, '-'*22))
-    pattern = pattern.replace('^', '<')
+    results = ( repeat(partial(single_test, size, recrypt_aesaes), RUNS, OUT)
+              + repeat(partial(single_test, size, ta.encrypt), RUNS, OUT))
+    print(pattern.format(naturalsize(size,binary=True), results[0], results[2]))
+    return results
 
-    for size in sizes:
-        print(pattern.format(size,
-              single_test(size, lambda cipher: a2.encrypt(a1.decrypt(cipher))),
-              single_test(size, ta.encrypt)))
+def plot(results):
+    xs = sizes
+    ys_aesaes, std_aesaes, ys_twoaes, std_twoaes = map(np.array, zip(*results))
+
+    fig, ax1 = plt.subplots()
+
+    ax1.set_xscale('log')
+    ax1.set_xlabel('file size')
+    ax1.set_xlim(xs[0], xs[-1])
+    ax1.set_xticks(xs)
+    ax1.set_xticklabels([naturalsize(x, binary=True) for x in xs], rotation=90)
+
+    ax1.set_yscale('log')
+    ax1.set_ylabel('re-encryption time')
+    ax1.set_ylim(0, max(max(ys_aesaes), max(ys_twoaes)) * 1.2)
+
+    ax1.errorbar(xs, ys_aesaes, yerr=std_aesaes, fmt='r^--', label='AES+AES')
+    ax1.errorbar(xs, ys_twoaes, yerr=std_twoaes, fmt='b-',  label='TWOAES')
+    ax1.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes>ys_twoaes,
+                     facecolor='g', alpha=.2, interpolate=True)
+    ax1.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
+                     facecolor='r', alpha=.2, interpolate=True)
+
+    plt.legend(loc='lower right')
+    plt.tight_layout()
+
 
 if __name__ == '__main__':
-    print('\n' + "WITH AESNI".center(72, '='))
-    test(use_aesni=True)
-    print('\n' + "WITHOUT AESNI".center(72, '='))
-    test(use_aesni=False)
+    print(pattern.format('SIZE', 'TIME AES+AES', 'TIME TWOAES'))
 
+    print('\n' + "WITH AESNI".center(72, '='))
+    results = [test(size, use_aesni=True) for size in sizes]
+    plot(results)
+    plt.savefig('twoaes_with_aesni.png')
+    plt.savefig('twoaes_with_aesni.pdf')
+
+    print('\n' + "WITHOUT AESNI".center(72, '='))
+    results = [test(size, use_aesni=False) for size in sizes]
+    plot(results)
+    plt.savefig('twoaes_without_aesni.png')
+    plt.savefig('twoaes_without_aesni.pdf')
