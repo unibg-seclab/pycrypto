@@ -19,6 +19,7 @@ GiB = 2**10 * MiB
 SIZE = 1*MiB
 MINWIN = 1
 MAXWIN = 10
+STEPWIN = 1
 RUNS = 50
 OUT = 5
 
@@ -31,7 +32,8 @@ k1 = '1234567890123456'
 k2 = 'abcdefghijklmnop'
 
 def remove_outliers(lst, outliers):
-    return sorted(lst)[outliers:-outliers]
+    lst = sorted(lst)
+    return lst if not outliers else lst[outliers:-outliers]
 
 def repeat(fn, times, outliers):
     data = [fn() for _ in range(times)]
@@ -66,7 +68,7 @@ def test(use_aesni, size, window):
     return results
 
 def plot(results):
-    xs = range(MINWIN, MAXWIN+1)
+    xs = range(MINWIN, MAXWIN+1, STEPWIN)
     ys_aesaes, std_aesaes, ys_twoaes, std_twoaes = [array(ys) * 10**3 for ys in zip(*results)]
     ys_aesaes = array([mean(ys_aesaes) for _ in xrange(len(xs))])
     std_aesaes = array([mean(std_aesaes) for _ in xrange(len(xs))])
@@ -90,7 +92,7 @@ def plot(results):
 if __name__ == '__main__':
     print('\n' + "WITH AESNI".center(72, '='))
     results = [test(use_aesni=True, size=SIZE, window=window)
-               for window in range(MINWIN, MAXWIN+1)]
+               for window in range(MINWIN, MAXWIN+1, STEPWIN)]
     plot(results)
     plt.savefig('figures/twoaes_winsize.pdf')
     plt.savefig('figures/twoaes_winsize.png')
