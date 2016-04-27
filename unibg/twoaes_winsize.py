@@ -88,6 +88,7 @@ def plot(results):
                      facecolor='r', alpha=.2, interpolate=True)
 
     plt.legend()
+    plt.tight_layout()
 
 if __name__ == '__main__':
     print('\n' + "WITH AESNI".center(72, '='))
