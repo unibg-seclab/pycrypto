@@ -101,11 +101,11 @@ if __name__ == '__main__':
     print('\n' + "WITH AESNI".center(72, '='))
     results = [test(size, use_aesni=True) for size in sizes]
     plot(results)
-    plt.savefig('twoaes_with_aesni.png')
-    plt.savefig('twoaes_with_aesni.pdf')
+    plt.savefig('figures/twoaes_with_aesni.png')
+    plt.savefig('figures/twoaes_with_aesni.pdf')
 
     print('\n' + "WITHOUT AESNI".center(72, '='))
     results = [test(size, use_aesni=False) for size in sizes]
     plot(results)
-    plt.savefig('twoaes_without_aesni.png')
-    plt.savefig('twoaes_without_aesni.pdf')
+    plt.savefig('figures/twoaes_without_aesni.png')
+    plt.savefig('figures/twoaes_without_aesni.pdf')
