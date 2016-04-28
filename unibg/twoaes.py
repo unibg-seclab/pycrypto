@@ -14,8 +14,8 @@ from os import urandom
 ## PARAMETERS ##
 EXPMIN = 10
 EXPMAX = 30
-RUNS = 10
-OUT = 2
+RUNS = 50
+OUT = 10
 
 # bytegenerator = lambda size: urandom(size)
 bytegenerator = lambda size: bytes(bytearray(size))
