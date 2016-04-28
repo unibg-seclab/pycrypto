@@ -1,8 +1,4 @@
-## py.test
-
-`py.test` tests that:
-
-    twoaes.encrypt == aes.encrypt(aes.decrypt)
+# PyCrypto UniBG-Seclab Tests
 
 ## twoaes.py
 
@@ -26,5 +22,11 @@ parameters.
 
 ## speedtest_small.py
 
-Test AES {128,256} {ECB,CBC,CTR} encryption rate with and without AES-NI.
-The output is produced averaging 10 results.
+Test `AES {128,256} {ECB,CBC,CTR}` encryption rate with and without AES-NI.
+
+## py.test
+
+`py.test` tests that:
+
+    twoaes.encrypt == aes.encrypt(aes.decrypt)
+
