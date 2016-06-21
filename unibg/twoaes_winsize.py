@@ -87,7 +87,7 @@ def plot(results):
 #    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
 #                     facecolor='r', alpha=.2, interpolate=True)
 
-    plt.legend()
+    plt.legend(frameon=False)
     plt.tight_layout()
 
 if __name__ == '__main__':
@@ -95,5 +95,5 @@ if __name__ == '__main__':
     results = [test(use_aesni=True, size=SIZE, window=window)
                for window in range(MINWIN, MAXWIN+1, STEPWIN)]
     plot(results)
-    plt.savefig('figures/twoaes_winsize.pdf')
+    plt.savefig('figures/twoaes_winsize.eps')
     plt.savefig('figures/twoaes_winsize.png')
