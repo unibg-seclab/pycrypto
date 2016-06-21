@@ -4,6 +4,8 @@ import matplotlib
 matplotlib.use('Agg') # do not use X
 from matplotlib import pyplot as plt
 
+matplotlib.rcParams.update({'font.size': 18})
+
 from numpy import std, mean, array
 
 from Crypto.Cipher import AES, TWOAES
@@ -87,7 +89,7 @@ def plot(results):
 #    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
 #                     facecolor='r', alpha=.2, interpolate=True)
 
-    plt.legend(loc='lower right', frameon=False)
+    plt.legend(loc='lower right', frameon=False, prop={'size': 18})
     plt.tight_layout()
 
 if __name__ == '__main__':
