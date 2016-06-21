@@ -70,22 +70,22 @@ def test(use_aesni, size, window):
 def plot(results):
     xs = range(MINWIN, MAXWIN+1, STEPWIN)
     ys_aesaes, std_aesaes, ys_twoaes, std_twoaes = [array(ys) * 10**3 for ys in zip(*results)]
-    ys_aesaes = array([mean(ys_aesaes) for _ in xrange(len(xs))])
-    std_aesaes = array([mean(std_aesaes) for _ in xrange(len(xs))])
+    ys_aesaes = array([mean(ys_aesaes) for _ in range(len(xs))])
+    std_aesaes = array([mean(std_aesaes) for _ in range(len(xs))])
 
-    plt.xlabel('TWOAES windows size ($blocks$)')
+    plt.xlabel('TWOAES windows size [$blocks$]')
     plt.xlim(xs[0], xs[-1])
     plt.xticks(xs, xs)
 
-    plt.ylabel('time ($ms$)')
+    plt.ylabel('time [$ms$]')
     plt.ylim(0, max(max(ys_aesaes), max(ys_twoaes)) * 1.2)
 
     plt.errorbar(xs, ys_aesaes, yerr=std_aesaes, fmt='r^--', label='AES+AES')
     plt.errorbar(xs, ys_twoaes, yerr=std_twoaes, fmt='b-',  label='TWOAES')
-    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes>ys_twoaes,
-                     facecolor='g', alpha=.2, interpolate=True)
-    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
-                     facecolor='r', alpha=.2, interpolate=True)
+#    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes>ys_twoaes,
+#                     facecolor='g', alpha=.2, interpolate=True)
+#    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
+#                     facecolor='r', alpha=.2, interpolate=True)
 
     plt.legend()
     plt.tight_layout()
