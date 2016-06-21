@@ -19,6 +19,8 @@ pattern = '{:<22} | {:<22} | {:<22}'
 k1 = '1234567890123456'
 k2 = 'abcdefghijklmnop'
 
+#occupyram = bytegenerator(5 * 2**30)
+
 
 def remove_outliers(data, outliers):
     data.sort()
