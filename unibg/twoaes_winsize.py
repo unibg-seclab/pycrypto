@@ -87,7 +87,7 @@ def plot(results):
 #    plt.fill_between(xs, ys_aesaes, ys_twoaes, where=ys_aesaes<ys_twoaes,
 #                     facecolor='r', alpha=.2, interpolate=True)
 
-    plt.legend(frameon=False)
+    plt.legend(loc='lower right', frameon=False)
     plt.tight_layout()
 
 if __name__ == '__main__':
